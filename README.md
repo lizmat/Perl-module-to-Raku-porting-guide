@@ -57,3 +57,72 @@ any arguments, it will look if they're marked with "is export(:FOO)".  If not al
 arguments were found, it means one is trying to import things the module doesn't
 know about.  So let the world know it can't do that.  Otherwise return the `Map`
 with the export information and let the system deal with it.
+
+## Moose and friends (OO)
+
+You don't need them. OO is builtin to Perl 6 to the extent that almost everything
+is an object:
+
+    class Geo::IP2Location::Lite
+
+    has %!file is required;
+
+You can also trivially define your own types:
+
+    subset IPv4 of Str where / (\d ** 1..3) ** 4 % '.' /;
+
+Then use them within method signatures:
+
+    method get_country ( IPv4 $ip ) { ... }
+
+View [Classes and Objects](https://docs.perl6.org/language/classtut) for much more
+information about this
+
+## pack / unpack
+
+pack / unpack are still experimental in Perl 6, however we are able to get to the
+native data types with NativeCall so can implement most of what we need:
+
+    use NativeCall;
+
+    method !read8 ( IO::Handle $handle, Int $position ) {
+        $handle.seek($position-1, SeekFromBeginning);
+        my $data = $handle.read(1);
+        nativecast((int8), Blob.new($data));
+    }
+
+This is roughly equivalent to:
+
+    sub read8 {
+        my ($handle, $position) = @_;
+        my $data = "";
+        seek($handle, $position-1, 0);
+        read($handle, $data, 1);
+        return unpack("C", $data);
+    }
+
+## Tests
+
+You will find the Test functions map quite nicely in Perl 6 to the Pumpkin Perl 5
+modules, and most of the extra Test:: namespace functions are builtin to the Perl 6
+[Test](https://docs.perl6.org/language/testing) class
+
+    use Test;
+
+    plan 10;
+
+    ...
+
+    for %ips.keys -> $k {
+        is( $ip2.get_country_short( $k ),%ips{$k},"$k resolves to { %ips{$k} }" );
+    }
+
+Running them just requires the `--exec` argument to prove:
+
+    /Volumes/code_partition/geo-ip2location-lite-p6 > prove --exec perl6 -Ilib -r
+    ./t/004_exceptions.t ... ok
+    ./t/005_lookup.t ....... ok
+    ./t/010_lookup_full.t .. ok
+    All tests successful.
+    Files=3, Tests=35,  1 wallclock secs ( 0.02 usr  0.01 sys +  0.94 cusr  0.12 csys =  1.09 CPU)
+    Result: PASS

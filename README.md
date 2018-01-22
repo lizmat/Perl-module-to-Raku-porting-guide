@@ -1,6 +1,21 @@
 # P5-modules-to-P6-porting-guide
 Porting Guide for porting Pumpkin Perl 5 Modules to Rakudo Perl 6
 
+# while loops with list assignment
+
+Using list assignments in `while` loops will not work, because the assignment
+will happen anyway even if an empty list is returned, so that this:
+
+    while (($key, $value) = each %hash) { }
+
+will loop forever.  There is unfortunately no way to fix this in Perl 6 module
+space at the moment.  But a slightly different syntax, will work as expected:
+
+    while each(%hash) -> ($key,$value) { }
+
+Also, this will alias the values in the list, so you don't actually need to
+define `$key` and `$value` outside of the `while` loop to make this work.
+
 # undef vs Nil
 
 `Nil` is the closest thing that Perl 6 has to Perl 5's `undef`.  `Nil` is the

@@ -110,6 +110,25 @@ The first mult-sub taking no parameter will call itself, but with the `$_`
 (`<$_>`) of the callers scope (`CALLER::`).  The second multi-sub takes
 one parameter, which will just `say`, as we did in the Perl 5 version.
 
+## tie
+
+There is no `tie` as such in Perl 6.
+
+The Perl 6 ecosystem also contains the L<P5pack|http://modules.perl6.org/dist/P5tie> module that exports C<tie>, C<untie> and C<tied> functions that support
+many of the features of Perl 5's tie / untie / tied.  But using that module
+will rob you of many exciting new Perl 6 capabilities.
+
+### tieing a scalar
+
+If you like to use the functionality of tieing a scalar value, you should look
+at [the Proxy object](https://docs.perl6.org/type/Proxy) and
+[Custom Containers](https://docs.perl6.org/language/containers).
+
+### tieing an array / hash
+
+If you like to use the functionality of tieing an array or a hash, you should
+look at [Subscripts / Custom Types](https://docs.perl6.org/language/subscripts#Custom_types).
+
 ## pack / unpack
 
 pack / unpack are still experimental in Perl 6, however we are able to get

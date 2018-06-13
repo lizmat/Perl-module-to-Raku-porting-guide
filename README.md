@@ -19,14 +19,14 @@ define `$key` and `$value` outside of the `while` loop to make this work.
 # undef vs Nil
 
 `Nil` is the closest thing that Perl 6 has to Perl 5's `undef`.  `Nil` is the
-value that indicates the absence of a value.  If you assign `Nil` to a variable,
-it will reset the variable to its default value.  If you haven't specified a
-default value, and you haven't specified a type, it will set the variable to
-`Any` upon assignment of Nil.
+value that indicates the absence of a value.  If you assign `Nil` to a
+variable, it will reset the variable to its default value.  If you haven't
+specified a default value, and you haven't specified a type, it will set the
+variable to `Any` upon assignment of Nil.
 
-If you need to be able to pass a `Nil` value around, you **can** do this, but it
-requires some care: you will need to either only bind to values that can have
-a `Nil` value, or make sure the default value of the variable is `Nil`.
+If you need to be able to pass a `Nil` value around, you **can** do this, but
+it requires some care: you will need to either only bind to values that can
+have a `Nil` value, or make sure the default value of the variable is `Nil`.
 
     my $a := frobnicate(42);                 # binding
     my \b  = frobnicate(666);                # no sigil means binding
@@ -42,41 +42,38 @@ The basic functionality is explained at
 
 ## Don't want to export anything by default
 
-If you don't want to export anything by default, then mark the subroutines with
-`is export(:FOO)` where `FOO` is a string that has meaning to you as a developer.
+If you don't want to export anything by default, then mark the subroutines
+with `is export(:FOO)` where `FOO` is a string that has meaning to you as a
+developer.  To self-document this, you could use the string "DONTEXPORT":
 
-    sub frobnicate($a) is export(:FOO) { ... }
+    sub frobnicate($a) is export(:DONTEXPORT) { ... }
 
 By specifying a specific name, you're preventing the standard export logic to
 export that sub if you don't specify anything in the `use` statement.
 
 Outside of the scope of any class in the compilation unit, you must create a
-subroutine named `EXPORT` that takes any positional arguments.  Something like:
+subroutine named `EXPORT` that takes any positional arguments.  Something
+like:
 
     sub EXPORT(*@args) {
-        if @args { 
-            my $imports := Map.new( |(EXPORT::FOO::{ @args.map: '&' ~ * }:p) );
-            if $imports != @args {   
-                die "PACKAGENAME doesn't know how to export: "
-                  ~ @args.grep( { !$imports{$_} } ).join(', ')
-            }   
-            $imports
+        my %imports = EXPORT::FOO::{ @args.map: '&' ~ * }:p;
+        if @args.grep( { !%imports{$_} } ) -> @huh {
+            die "PACKAGENAME doesn't know how to export: @huh.join(', ')";
         }   
-        else {
-            Map.new
-        }   
+        %imports
     }
 
-This `EXPORT` sub will be executed when a `use` of the file is done.  If it gets
-any arguments, it will look if they're marked with "is export(:FOO)".  If not all
-arguments were found, it means one is trying to import things the module doesn't
-know about.  So let the world know it can't do that.  Otherwise return the `Map`
-with the export information and let the system deal with it.
+This `EXPORT` sub will be executed when a `use` of the file is done.  If it
+gets any arguments, it will look if they're marked with "is export(:FOO)".
+If not all arguments were found, it means one is trying to import things the
+module doesn't know about.  So let the world know it can't do that.
+Otherwise return the hash with the export information and let the system
+deal with it.
 
 ## Moose and friends (OO)
 
-You don't need them. OO is builtin to Perl 6 to the extent that almost everything
-is an object:
+You don't need them. OO is builtin to Perl 6 to the extent that almost
+everything is an object:
 
     class Geo::IP2Location::Lite
 
@@ -90,13 +87,13 @@ Then use them within method signatures:
 
     method get_country ( IPv4 $ip ) { ... }
 
-View [Classes and Objects](https://docs.perl6.org/language/classtut) for much more
-information about this
+View [Classes and Objects](https://docs.perl6.org/language/classtut) for much
+more information about this
 
 ## pack / unpack
 
-pack / unpack are still experimental in Perl 6, however we are able to get to the
-native data types with NativeCall so can implement most of what we need:
+pack / unpack are still experimental in Perl 6, however we are able to get
+to the native data types with NativeCall so can implement most of what we need:
 
     use NativeCall;
 
@@ -116,10 +113,14 @@ This is roughly equivalent to:
         return unpack("C", $data);
     }
 
+The Perl 6 ecosystem also contains the L<P5pack|http://modules.perl6.org/dist/P5pack> module that exports a C<pack> and C<unpack> function that supports many
+of the features of Perl 5's pack / unpack.
+
 ## Tests
 
-You will find the Test functions map quite nicely in Perl 6 to the Pumpkin Perl 5
-modules, and most of the extra Test:: namespace functions are builtin to the Perl 6
+You will find the Test functions map quite nicely in Perl 6 to the Pumpkin
+Perl 5 modules, and most of the extra Test:: namespace functions are builtin
+to the Perl 6
 [Test](https://docs.perl6.org/language/testing) class
 
     use Test;
@@ -129,7 +130,7 @@ modules, and most of the extra Test:: namespace functions are builtin to the Per
     ...
 
     for %ips.keys -> $k {
-        is( $ip2.get_country_short( $k ),%ips{$k},"$k resolves to { %ips{$k} }" );
+        is $ip2.get_country_short( $k ),%ips{$k},"$k resolves to { %ips{$k} }";
     }
 
 Running them just requires the `--exec` argument to prove:

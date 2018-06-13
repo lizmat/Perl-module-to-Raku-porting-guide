@@ -90,6 +90,26 @@ Then use them within method signatures:
 View [Classes and Objects](https://docs.perl6.org/language/classtut) for much
 more information about this
 
+## the _ prototype
+
+In Perl 5 you can have a `_` prototype, that will default the parameter to
+use the `$_` of the scope of the caller.  There is no such thing in Perl 6.
+However, it can be mimicked with some work, by using multi-dispatch.  If
+in Perl 5 you would do:
+
+    sub foo(_) { my $value = shift; say $value }
+    $_ = 42;
+    foo;      # says "42"
+
+You would write this as a multi-sub in Perl 6:
+
+    multi sub foo()       { foo( CALLERS::<$_> ) }
+    multi sub foo($value) { say $value }
+
+The first mult-sub taking no parameter will call itself, but with the `$_`
+(`<$_>`) of the callers scope (`CALLER::`).  The second multi-sub takes
+one parameter, which will just `say`, as we did in the Perl 5 version.
+
 ## pack / unpack
 
 pack / unpack are still experimental in Perl 6, however we are able to get

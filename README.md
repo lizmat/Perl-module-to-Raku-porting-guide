@@ -90,6 +90,28 @@ Then use them within method signatures:
 View [Classes and Objects](https://docs.perl6.org/language/classtut) for much
 more information about this
 
+## timely destruction
+
+There is no such thing as timely destruction in Perl 6.  Perl 6 *does* support
+the `DESTROY` method in a class.  However, there is *no* guarantee when this
+method will be called on an object, if ever.  If the program is done, it
+will simply exit and *not* call the `DESTROY` method on remaining live
+objects.  This can be troublesome for some cases.
+
+The Perl 6 ecosystem contains a module [FINALIZER](http://modules.perl6.org/dist/FINALIZER)
+that can be used by module developers to register code that will be run when
+an object needs to be finalized in a timely fashion (by default, on program
+exit).  In the simplest case, this looks like:
+
+    method new(|c) {
+        my $object = self.bless(|c);
+        FINALIZER.register: { $object.finalize }
+        $object
+    }
+
+See the documentation of [FINALIZER](http://modules.perl6.org/dist/FINALIZER)
+for more information.
+
 ## the _ prototype
 
 In Perl 5 you can have a `_` prototype, that will default the parameter to

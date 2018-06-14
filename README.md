@@ -33,6 +33,13 @@ value that was frozen at compile time.
 
 For more information, see [Phasers](https://docs.perl6.org/language/phasers).
 
+Please note that the time when a `BEGIN` phaser is executed in the case of
+a module, is usually when the module is being *pre-compiled* and installed.
+So do not expect any code of the module to run every time the module is loaded
+(because it will usually already be pre-compiled).  If you need to run code
+everytime the module is loaded, put this in the mainline of the module, or
+in an `INIT` phaser.
+
 # lazy lists
 
 Many functions in Perl 6 have the same name, but return a `Seq`uence rather

@@ -139,7 +139,8 @@ one parameter, which will just `say`, as we did in the Perl 5 version.
 
 There is no `tie` as such in Perl 6.
 
-The Perl 6 ecosystem also contains the L<P5pack|http://modules.perl6.org/dist/P5tie> module that exports C<tie>, C<untie> and C<tied> functions that support
+The Perl 6 ecosystem also contains the [P5pack](http://modules.perl6.org/dist/P5tie>)
+module that exports `tie`, `untie` and `tied` functions that support
 many of the features of Perl 5's tie / untie / tied.  But using that module
 will rob you of many exciting new Perl 6 capabilities.
 
@@ -177,7 +178,8 @@ This is roughly equivalent to:
         return unpack("C", $data);
     }
 
-The Perl 6 ecosystem also contains the L<P5pack|http://modules.perl6.org/dist/P5pack> module that exports a C<pack> and C<unpack> function that supports many
+The Perl 6 ecosystem also contains the [P5pack](http://modules.perl6.org/dist/P5pack)
+module that exports a `pack` and `unpack` function that supports many
 of the features of Perl 5's pack / unpack.
 
 ## Tests

@@ -16,6 +16,23 @@ space at the moment.  But a slightly different syntax, will work as expected:
 Also, this will alias the values in the list, so you don't actually need to
 define `$key` and `$value` outside of the `while` loop to make this work.
 
+# BEGIN / INIT / CHECK / END blocks
+
+These types of blocks are called `phasers` in Perl 6, of which there are
+many more in Perl 6.  The `BEGIN`, `INIT`, `CHECK` and `END` blocks function
+just like they do in Perl 5, with some important improvements.  Phasers share
+the surrounding scope if they are just a single statement:
+
+    BEGIN my $foo = 42;
+    say $foo;    # 42
+
+Also, the BEGIN phaser can be used in any expression as an ad-hoc constant
+value that was frozen at compile time.
+
+    say "This code was compiled at { BEGIN DateTime.now }";
+
+For more information, see [Phasers](https://docs.perl6.org/language/phasers).
+
 # lazy lists
 
 Many functions in Perl 6 have the same name, but return a `Seq`uence rather

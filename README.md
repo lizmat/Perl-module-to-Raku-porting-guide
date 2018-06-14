@@ -111,20 +111,23 @@ deal with it.
 You don't need them. OO is builtin to Perl 6 to the extent that almost
 everything is an object:
 
-    class Geo::IP2Location::Lite
+    class Foo {
+        has %.bar;
+    }
+    my $foo = Foo.new( bar => 42 );
+    my Foo $foo .= new(bar => 42 ); # alternate, using a constraint
 
-    has %!file is required;
-
-You can also trivially define your own types:
+You can also trivially define your own subtypes:
 
     subset IPv4 of Str where / (\d ** 1..3) ** 4 % '.' /;
 
-Then use them within method signatures:
+Then use them within method signatures, e.g. a subroutine that takes an IP
+number and returns a name (as a `Str`) for it:
 
-    method get_country ( IPv4 $ip ) { ... }
+    sub ip2name(IPv4 $ip --> Str) { ... }
 
 View [Classes and Objects](https://docs.perl6.org/language/classtut) for much
-more information about this
+more information about this.
 
 ## timely destruction
 

@@ -100,7 +100,7 @@ objects.  This can be troublesome for some cases.
 
 The Perl 6 ecosystem contains a module [FINALIZER](http://modules.perl6.org/dist/FINALIZER)
 that can be used by module developers to register code that will be run when
-an object needs to be finalized in a timely fashion (by default, on program
+an object needs to be finalized in a timely fashion (for instance on program
 exit).  In the simplest case, this looks like:
 
     submethod TWEAK() {

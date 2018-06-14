@@ -23,6 +23,11 @@ than a list.  In most cases, that really doesn't matter, as you either assign
 it to an array, or use the result to iterate over.  If you, for some reason,
 really want a list, you can get that calling the `.list` method on it.
 
+# defining constants
+
+Defining constants is straightforward: instead of `use constant DEBUG => 0`,
+the syntax is simply `constant DEBUG = 0`.
+
 # undef vs Nil
 
 `Nil` is the closest thing that Perl 6 has to Perl 5's `undef`.  `Nil` is the

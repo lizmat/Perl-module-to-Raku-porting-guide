@@ -16,6 +16,13 @@ space at the moment.  But a slightly different syntax, will work as expected:
 Also, this will alias the values in the list, so you don't actually need to
 define `$key` and `$value` outside of the `while` loop to make this work.
 
+# lazy lists
+
+Many functions in Perl 6 have the same name, but return a `Seq`uence rather
+than a list.  In most cases, that really doesn't matter, as you either assign
+it to an array, or use the result to iterate over.  If you, for some reason,
+really want a list, you can get that calling the `.list` method on it.
+
 # undef vs Nil
 
 `Nil` is the closest thing that Perl 6 has to Perl 5's `undef`.  `Nil` is the

@@ -103,10 +103,13 @@ that can be used by module developers to register code that will be run when
 an object needs to be finalized in a timely fashion (by default, on program
 exit).  In the simplest case, this looks like:
 
-    method new(|c) {
-        my $object = self.bless(|c);
-        FINALIZER.register: { $object.finalize }
-        $object
+    submethod TWEAK() {
+        &!unregister = FINALIZER.register: { .finalize with self }
+    }
+
+    method finalize() {
+        &!unregister();  # make sure there's no registration anymore
+        # do whatever we need to finalize, e.g. close db connection
     }
 
 See the documentation of [FINALIZER](http://modules.perl6.org/dist/FINALIZER)

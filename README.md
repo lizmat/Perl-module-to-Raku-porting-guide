@@ -171,7 +171,7 @@ You would write this as a multi-sub in Perl 6:
     multi sub foo($value) { say $value }
 
 The first mult-sub taking no parameter will call itself, but with the `$_`
-(`<$_>`) of the callers scope (`CALLER::`).  The second multi-sub takes
+(`<$_>`) of the callers scope (`CALLERS::`).  The second multi-sub takes
 one parameter, which will just `say`, as we did in the Perl 5 version.
 
 ## tie

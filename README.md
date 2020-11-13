@@ -1,5 +1,5 @@
-# P5-modules-to-P6-porting-guide
-Porting Guide for porting Pumpkin Perl 5 Modules to Rakudo Perl 6
+# Perl-module-to-Raku-porting-guide
+Porting Guide for porting Perl Modules to Raku
 
 # while loops with list assignment
 
@@ -8,7 +8,7 @@ will happen anyway even if an empty list is returned, so that this:
 
     while (($key, $value) = each %hash) { }
 
-will loop forever.  There is unfortunately no way to fix this in Perl 6 module
+will loop forever.  There is unfortunately no way to fix this in Raku module
 space at the moment.  But a slightly different syntax, will work as expected:
 
     while each(%hash) -> ($key,$value) { }
@@ -18,9 +18,9 @@ define `$key` and `$value` outside of the `while` loop to make this work.
 
 # BEGIN / INIT / CHECK / END blocks
 
-These types of blocks are called `phasers` in Perl 6, of which there are
-many more in Perl 6.  The `BEGIN`, `INIT`, `CHECK` and `END` blocks function
-just like they do in Perl 5, with some important improvements.  Phasers share
+These types of blocks are called `phasers` in Raku, of which there are
+many more in Raku.  The `BEGIN`, `INIT`, `CHECK` and `END` blocks function
+just like they do in Perl, with some important improvements.  Phasers share
 the surrounding scope if they are just a single statement:
 
     BEGIN my $foo = 42;
@@ -31,7 +31,7 @@ value that was frozen at compile time.
 
     say "This code was compiled at { BEGIN DateTime.now }";
 
-For more information, see [Phasers](https://docs.perl6.org/language/phasers).
+For more information, see [Phasers](https://docs.raku.org/language/phasers).
 
 Please note that the time when a `BEGIN` phaser is executed in the case of
 a module, is usually when the module is being *pre-compiled* and installed.
@@ -42,7 +42,7 @@ in an `INIT` phaser.
 
 # lazy lists
 
-Many functions in Perl 6 have the same name, but return a `Seq`uence rather
+Many functions in Raku have the same name, but return a `Seq`uence rather
 than a list.  In most cases, that really doesn't matter, as you either assign
 it to an array, or use the result to iterate over.  If you, for some reason,
 really want a list, you can get that calling the `.list` method on it.
@@ -54,7 +54,7 @@ the syntax is simply `constant DEBUG = 0`.
 
 # undef vs Nil
 
-`Nil` is the closest thing that Perl 6 has to Perl 5's `undef`.  `Nil` is the
+`Nil` is the closest thing that Raku has to Perl's `undef`.  `Nil` is the
 value that indicates the absence of a value.  If you assign `Nil` to a
 variable, it will reset the variable to its default value.  If you haven't
 specified a default value, and you haven't specified a type, it will set the
@@ -71,10 +71,10 @@ have a `Nil` value, or make sure the default value of the variable is `Nil`.
     my $d; $d = Nil; # Any
 
 # Exporter
-Perl 6 has an Exporter built in, so you don't need to `use` one.
+Raku has an Exporter built in, so you don't need to `use` one.
 
 The basic functionality is explained at
-[Exporting and Selective Importing](https://docs.perl6.org/language/modules#Exporting_and_Selective_Importing)
+[Exporting and Selective Importing](https://docs.raku.org/language/modules#Exporting_and_Selective_Importing)
 
 ## Don't want to export anything by default
 
@@ -108,7 +108,7 @@ deal with it.
 
 ## Moose and friends (OO)
 
-You don't need them. OO is builtin to Perl 6 to the extent that almost
+You don't need them. OO is builtin to Raku to the extent that almost
 everything is an object:
 
     class Foo {
@@ -126,18 +126,18 @@ number and returns a name (as a `Str`) for it:
 
     sub ip2name(IPv4 $ip --> Str) { ... }
 
-View [Classes and Objects](https://docs.perl6.org/language/classtut) for much
+View [Classes and Objects](https://docs.raku.org/language/classtut) for much
 more information about this.
 
 ## timely destruction
 
-There is no such thing as timely destruction in Perl 6.  Perl 6 *does* support
+There is no such thing as timely destruction in Raku.  Raku *does* support
 the `DESTROY` method in a class.  However, there is *no* guarantee when this
 method will be called on an object, if ever.  If the program is done, it
 will simply exit and *not* call the `DESTROY` method on remaining live
 objects.  This can be troublesome for some cases.
 
-The Perl 6 ecosystem contains a module [FINALIZER](http://modules.perl6.org/dist/FINALIZER)
+The Raku ecosystem contains a module [FINALIZER](http://modules.raku.org/dist/FINALIZER)
 that can be used by module developers to register code that will be run when
 an object needs to be finalized in a timely fashion (for instance on program
 exit).  In the simplest case, this looks like:
@@ -151,52 +151,52 @@ exit).  In the simplest case, this looks like:
         # do whatever we need to finalize, e.g. close db connection
     }
 
-See the documentation of [FINALIZER](http://modules.perl6.org/dist/FINALIZER)
+See the documentation of [FINALIZER](http://modules.raku.org/dist/FINALIZER)
 for more information.
 
 ## the _ prototype
 
-In Perl 5 you can have a `_` prototype, that will default the parameter to
-use the `$_` of the scope of the caller.  There is no such thing in Perl 6.
+In Perl you can have a `_` prototype, that will default the parameter to
+use the `$_` of the scope of the caller.  There is no such thing in Raku.
 However, it can be mimicked with some work, by using multi-dispatch.  If
-in Perl 5 you would do:
+in Perl you would do:
 
     sub foo(_) { my $value = shift; say $value }
     $_ = 42;
     foo;      # says "42"
 
-You would write this as a multi-sub in Perl 6:
+You would write this as a multi-sub in Raku:
 
     multi sub foo()       { foo( CALLERS::<$_> ) }
     multi sub foo($value) { say $value }
 
 The first mult-sub taking no parameter will call itself, but with the `$_`
 (`<$_>`) of the callers scope (`CALLERS::`).  The second multi-sub takes
-one parameter, which will just `say`, as we did in the Perl 5 version.
+one parameter, which will just `say`, as we did in the Perl version.
 
 ## tie
 
-There is no `tie` as such in Perl 6.
+There is no `tie` as such in Raku.
 
-The Perl 6 ecosystem also contains the [P5pack](http://modules.perl6.org/dist/P5tie>)
+The Raku ecosystem also contains the [P5tie](http://modules.raku.org/dist/P5tie>)
 module that exports `tie`, `untie` and `tied` functions that support
-many of the features of Perl 5's tie / untie / tied.  But using that module
-will rob you of many exciting new Perl 6 capabilities.
+many of the features of Perl's tie / untie / tied.  But using that module
+will rob you of many exciting new Raku capabilities.
 
 ### tieing a scalar
 
 If you like to use the functionality of tieing a scalar value, you should look
-at [the Proxy object](https://docs.perl6.org/type/Proxy) and
-[Custom Containers](https://docs.perl6.org/language/containers).
+at [the Proxy object](https://docs.raku.org/type/Proxy) and
+[Custom Containers](https://docs.raku.org/language/containers).
 
 ### tieing an array / hash
 
 If you like to use the functionality of tieing an array or a hash, you should
-look at [Subscripts / Custom Types](https://docs.perl6.org/language/subscripts#Custom_types).
+look at [Subscripts / Custom Types](https://docs.raku.org/language/subscripts#Custom_types).
 
 ## pack / unpack
 
-pack / unpack are still experimental in Perl 6, however we are able to get
+pack / unpack are still experimental in Raku, however we are able to get
 to the native data types with NativeCall so can implement most of what we need:
 
     use NativeCall;
@@ -217,16 +217,16 @@ This is roughly equivalent to:
         return unpack("C", $data);
     }
 
-The Perl 6 ecosystem also contains the [P5pack](http://modules.perl6.org/dist/P5pack)
+The Raku ecosystem also contains the [P5pack](http://modules.raku.org/dist/P5pack)
 module that exports a `pack` and `unpack` function that supports many
-of the features of Perl 5's pack / unpack.
+of the features of Perl's pack / unpack.
 
 ## Tests
 
-You will find the Test functions map quite nicely in Perl 6 to the Pumpkin
-Perl 5 modules, and most of the extra Test:: namespace functions are builtin
-to the Perl 6
-[Test](https://docs.perl6.org/language/testing) class
+You will find the Test functions map quite nicely in Raku to the Perl
+modules, and most of the extra Test:: namespace functions are builtin
+to the Raku
+[Test](https://docs.raku.org/language/testing) class
 
     use Test;
 
